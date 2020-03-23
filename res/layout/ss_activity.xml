@@ -1,0 +1,45 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#333333"
+    >
+    <SurfaceView 
+        android:id="@+id/displayview"
+        android:layout_width="match_parent"
+    	android:layout_height="match_parent"
+    	/>
+    
+    <SurfaceView 
+        android:id="@+id/preview"
+        android:layout_width="320dp"
+    	android:layout_height="180dp"
+    	android:layout_gravity="right|bottom"
+    	android:layout_alignParentRight="true"
+    	android:layout_alignParentBottom="true"
+    	/>
+    
+    <TextView
+        android:id="@+id/info_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_margin="5dp"
+        android:background="#88000000"
+        android:textColor="@android:color/white"
+        android:textSize="20sp"
+        >
+    </TextView>
+    
+    <Spinner
+        android:id="@+id/resolution"
+        android:layout_width="400dp"
+    	android:layout_height="35dp"
+    	android:layout_below="@id/info_text"
+    	android:layout_margin="5dp"
+    	android:background="#888888"
+    	android:textSize="20sp"
+    	/>
+    
+</RelativeLayout>
