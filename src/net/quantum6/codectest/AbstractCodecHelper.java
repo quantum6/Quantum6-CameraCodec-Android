@@ -35,10 +35,8 @@ abstract class AbstractCodecHelper
     protected int mWidth;
     protected int mHeight;
 
-    private byte[]      mEncodedBuffer;
     private AndroidVideoEncoder mEncoder;
 
-    private byte[]      mDecodedBuffer;
     private AndroidVideoDecoder mDecoder;
     
     private MediaCodecData mInputData;
@@ -86,20 +84,19 @@ abstract class AbstractCodecHelper
             return;
         }
         Log.d(TAG, "initCodec()");
-        int bufSize = mWidth * mHeight * ImageFormat.getBitsPerPixel(SurfaceViewCameraHelper.PREVIEW_FORMAT) / 8;
+        //int bufSize = mWidth * mHeight * ImageFormat.getBitsPerPixel(SurfaceViewCameraHelper.PREVIEW_FORMAT) / 8;
         if (null == mEncoder)
         {
             Log.d(TAG, "initCodec() mEncoder");
-            mEncodedBuffer = new byte[bufSize];
             mInputData = new MediaCodecData();
             mInputData.getInfo()[0] = mWidth;
             mInputData.getInfo()[1] = mHeight;
             mEncoder = new AndroidVideoEncoder(mWidth, mHeight, mFrameRate, mBitRate);
         }
+        
         if (null == mDecoder)
         {
             Log.d(TAG, "initCodec() mDecoder");
-            mDecodedBuffer = new byte[bufSize];
             int size = mWidth*mHeight*2;
             if (size < 128*1024)
             {
@@ -156,7 +153,7 @@ abstract class AbstractCodecHelper
     private void reset()
     {
     	clearCodec();
-    	isInited            = false;
+    	isInited      = false;
 
         mFpsStartTime = 0;
         mFpsCounter   = 0;
