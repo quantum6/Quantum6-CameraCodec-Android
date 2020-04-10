@@ -57,19 +57,17 @@ abstract class AbstractCodecHelper
         mWidth = 0;
         mHeight = 0;
         
-    	Log.d(TAG, "58");
         if (null != mDecoder)
         {
             mDecoder.release();
             mDecoder = null;
         }
-    	Log.d(TAG, "64");
+
         if (null != mEncoder)
         {
             mEncoder.release();
             mEncoder = null;
         }
-    	Log.d(TAG, "70");
     }
     
     public void initCodec(int width, int height)
