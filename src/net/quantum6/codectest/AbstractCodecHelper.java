@@ -144,7 +144,16 @@ abstract class AbstractCodecHelper
         if (null != mDecoder && dataLen > 0)
         {
         	dataLen = mDecoder.process(mOutputData, mInputData);
-            Log.d(TAG, "decoded length=" + dataLen);
+            Log.d(TAG, "decoded length first=" + dataLen);
+        	if (dataLen == -1)
+        	{
+                Log.d(TAG, "release and new AndroidVideoDecoder");
+        	    //Thread.dumpStack();
+        	    mDecoder.release();
+        	    mDecoder = new AndroidVideoDecoder(getSurface(), mWidth, mHeight);
+                dataLen = mDecoder.process(mOutputData, mInputData);
+                Log.d(TAG, "decoded length second=" + dataLen);
+        	}
         }
     }
 
