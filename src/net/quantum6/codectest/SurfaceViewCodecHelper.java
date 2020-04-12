@@ -48,7 +48,7 @@ final class SurfaceViewCodecHelper extends AbstractCodecHelper implements Surfac
     {
         mDisplayHolder = holder;
         
-        initCodec(mWidth, mHeight);
+        initCodec(mFrameWidth, mFrameHeight);
     }
 
     @Override
