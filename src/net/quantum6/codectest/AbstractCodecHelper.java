@@ -88,10 +88,7 @@ abstract class AbstractCodecHelper
         if (null == mEncoder)
         {
             Log.d(TAG, "initCodec() mEncoder");
-            mFrameData = new MediaCodecData(mFrameWidth, mFrameHeight);
-            mFrameData.getInfo()[0] = mFrameWidth;
-            mFrameData.getInfo()[1] = mFrameHeight;
-            
+            mFrameData   = new MediaCodecData(mFrameWidth, mFrameHeight);
             mEncodedData = new MediaCodecData(mFrameWidth, mFrameHeight);
             mEncoder     = new AndroidVideoEncoder(mFrameWidth, mFrameHeight, mFrameRate, mBitRate);
         }

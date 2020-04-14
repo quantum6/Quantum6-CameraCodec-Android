@@ -1,13 +1,11 @@
 package net.quantum6.codectest;
 
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
+
+import net.quantum6.kit.CameraKit;
 
 import android.graphics.ImageFormat;
 import android.hardware.Camera;
-import android.hardware.Camera.Size;
-import android.util.Log;
 
 /**
  * 
@@ -21,6 +19,9 @@ abstract class AbstractCameraHelper implements Camera.PreviewCallback
     public  final static int PREVIEW_FORMAT = ImageFormat.NV21;
     public  final static int frameRate      = 30;
 
+    private final static int DEFAULT_PREVIEW_WIDTH  = 640;
+    private final static int DEFAULT_PREVIEW_HEIGHT = 360;
+    
     private final static int MIN_FPS        = 10;
     private final static int MAX_FPS        = 60;
     
@@ -37,7 +38,7 @@ abstract class AbstractCameraHelper implements Camera.PreviewCallback
 
 
     private Camera      mCamera;
-    List<Size>          mSupportedSizes;
+    List<Camera.Size>   mSupportedSizes;
     Camera.Size         mPreviewSize;
 
     AbstractCodecHelper mCodecHelper;
@@ -96,30 +97,13 @@ abstract class AbstractCameraHelper implements Camera.PreviewCallback
         try
         {
             Camera.Parameters parameters = mCamera.getParameters();
-            mSupportedSizes = parameters.getSupportedPreviewSizes();
-            Collections.sort(mSupportedSizes, new SizeComparator());
-            for (int i = 0; i < mSupportedSizes.size(); i++)
-            {
-                Size size = mSupportedSizes.get(i);
-                if (       size.width  < MIN_VIDEO_SIZE
-                        || size.height < MIN_VIDEO_SIZE)
-                {
-                    mSupportedSizes.remove(i);
-                }
-                Log.d(TAG, "i=" + i + ", " + size.width + ", " + size.height);
-            }
-            if (0 == width || 0 == height)
-            {
-                Size size = mSupportedSizes.get(0);
-                width = size.width;
-                height= size.height;
-            }
-
-            parameters.setPreviewSize(width, height);
+            mSupportedSizes = CameraKit.getSupportedSizes(parameters);
+            Camera.Size bestSize = CameraKit.getCameraBestPreviewSize(parameters, DEFAULT_PREVIEW_WIDTH, DEFAULT_PREVIEW_HEIGHT);
+            parameters.setPreviewSize(bestSize.width, bestSize.height);
             parameters.setPreviewFormat(PREVIEW_FORMAT);
             parameters.setPreviewFpsRange(MIN_FPS*1000, MAX_FPS*1000);
             parameters.setPreviewFrameRate(frameRate);
-            parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO);
+            CameraKit.setCameraFocus(parameters);
             // parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
             // parameters.getSupportedPictureSizes();
             // parameters.setPictureSize(width, height);
@@ -135,7 +119,6 @@ abstract class AbstractCameraHelper implements Camera.PreviewCallback
         	setCameraPreviewDisplay(mCamera);
             mPreviewSize = mCamera.getParameters().getPreviewSize();
             int bufSize = mPreviewSize.width * mPreviewSize.height * ImageFormat.getBitsPerPixel(PREVIEW_FORMAT) / 8;
-            Log.d(TAG, "----" + bufSize + ", " + mPreviewSize.width + ", " + mPreviewSize.height);
             mCodecHelper.initCodec(mPreviewSize.width, mPreviewSize.height);
             for (int i = 0; i < BUFFER_COUNT; i++)
             {
@@ -209,33 +192,6 @@ abstract class AbstractCameraHelper implements Camera.PreviewCallback
         reset();
         
         clearSurface();
-    }
-
-    /**
-     * 为了确保正确性，强制排序一次。
-     * 
-     * @author PC
-     * 
-     */
-    private class SizeComparator implements Comparator<Size>
-    {
-        @Override
-        public int compare(Size arg0, Size arg1)
-        {
-            if (arg0.width > arg1.width)
-            {
-                return 1;
-            }
-            if (arg0.width < arg1.width)
-            {
-                return -1;
-            }
-            if (arg0.height == arg1.height)
-            {
-                return 0;
-            }
-            return (arg0.height > arg1.height) ? 1 : -1;
-        }
     }
 
 }
