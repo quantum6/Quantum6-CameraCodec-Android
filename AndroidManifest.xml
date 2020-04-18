@@ -22,7 +22,7 @@
         android:label="@string/app_name"
         android:theme="@android:style/Theme.Holo.NoActionBar" >
         <activity
-            android:name="net.quantum6.codectest.SSActivity"
+            android:name="net.quantum6.codectest.VideoActivity"
             android:screenOrientation="landscape"
             android:label="@string/app_name" >
             <intent-filter>

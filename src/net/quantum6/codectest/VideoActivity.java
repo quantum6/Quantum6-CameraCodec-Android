@@ -4,11 +4,13 @@ import java.util.LinkedList;
 import java.util.List;
 
 import android.app.Activity;
-import android.hardware.Camera.Size;
+import android.hardware.Camera;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.view.KeyEvent;
+import android.view.SurfaceHolder;
+import android.view.SurfaceView;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
@@ -26,9 +28,9 @@ import net.quantum6.kit.SystemKit;
  * @author PC
  *
  */
-public abstract class AbstractActivity extends Activity implements OnItemSelectedListener
+public final class VideoActivity extends Activity implements OnItemSelectedListener
 {
-    private final static String TAG = AbstractActivity.class.getCanonicalName();
+    private final static String TAG = VideoActivity.class.getCanonicalName();
 
     private final static int MESSAGE_CHECK_FPS      = 1;
     private final static int MESSAGE_CHECK_INIT     = 2;
@@ -46,24 +48,52 @@ public abstract class AbstractActivity extends Activity implements OnItemSelecte
      * 所以结论是Chromium for Android中可以使用TextureView替代SurfaceView作为合成表面，
      * 但带来的后果是占用更多的内存，性能下降。
      */
-    protected   View     mDisplayView;
-    protected   View     mPreviewView;
-    private     Spinner         mResolution;
-    private     TextView        mInfoText;
+    protected   View      mDisplayView;
+    protected   View      mPreviewView;
+    private     Spinner   mResolution;
+    private     TextView  mInfoText;
     
     protected AbstractCameraHelper mCameraHelper;
     protected AbstractCodecHelper  mCodecHelper;
-    private int mSelectedIndex                      = -1;
+    private int mSelectedIndex      = -1;
     
 
     //{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{
-    protected abstract int getLayout();
-    protected abstract String getTitleString();
+    protected int getLayout()
+    {
+        return R.layout.video_activity;
+    }
     
-    protected abstract void initHelpers();
+    protected void initHelpers()
+    {
+        if (null == mCodecHelper)
+        {
+            mCodecHelper    = new CodecHelper();
+        }
+        if (null == mCameraHelper)
+        {
+            mCameraHelper   = new CameraHelper();
+        }
+        mCameraHelper.mCodecHelper = mCodecHelper;
+    }
+    
+    protected View initDisplayView()
+    {
+        SurfaceView surfaceView = (SurfaceView) this.findViewById(R.id.displayview);
+        surfaceView.getHolder().addCallback((CodecHelper)mCodecHelper);
+        return surfaceView;
+    }
+    
+    protected View initPreviewView()
+    {
+        SurfaceView surfaceView = (SurfaceView) this.findViewById(R.id.preview);
+        surfaceView.setZOrderOnTop(true);
+        SurfaceHolder previewHolder = surfaceView.getHolder();
+        previewHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
+        previewHolder.addCallback((CameraHelper)mCameraHelper);
 
-    protected abstract View initDisplayView();
-    protected abstract View initPreviewView();
+        return surfaceView;
+    }
     //}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}
     
     @Override
@@ -100,7 +130,7 @@ public abstract class AbstractActivity extends Activity implements OnItemSelecte
                 case MESSAGE_CHECK_FPS:
                     if (null != mCameraHelper.mPreviewSize)
                     {
-                        mInfoText.setText(getTitleString()+"("+mCameraHelper.mPreviewSize.width+", "+mCameraHelper.mPreviewSize.height
+                        mInfoText.setText("("+mCameraHelper.mPreviewSize.width+", "+mCameraHelper.mPreviewSize.height
                                 +")="+mCodecHelper.mFpsCurrent
                                 +", "+SystemKit.getText(getApplicationContext()));
                         mHandler.sendEmptyMessageDelayed(MESSAGE_CHECK_FPS, TIME_DELAY);
@@ -113,18 +143,18 @@ public abstract class AbstractActivity extends Activity implements OnItemSelecte
                         List<String> resolutions = new LinkedList<String>();
                         for (int i = 0; i < mCameraHelper.mSupportedSizes.size(); i++)
                         {
-                            Size size = mCameraHelper.mSupportedSizes.get(i);
+                            Camera.Size size = mCameraHelper.mSupportedSizes.get(i);
                             resolutions.add("分辨率"+i+"=("+size.width+", "+size.height+")");
                         }
 
                         ArrayAdapter<String> adapter = new ArrayAdapter<String>(
-                                AbstractActivity.this.getApplicationContext(), 
+                                VideoActivity.this.getApplicationContext(), 
                                 R.layout.spinner_item,
                                 resolutions
                                 );
                         adapter.setDropDownViewResource(R.layout.spinner_dropdown_item);
                         mResolution.setAdapter(adapter);
-                        mResolution.setOnItemSelectedListener(AbstractActivity.this);
+                        mResolution.setOnItemSelectedListener(VideoActivity.this);
                         mHandler.sendEmptyMessageDelayed(MESSAGE_CHECK_FPS, TIME_DELAY);
                     }
                     else
@@ -213,11 +243,11 @@ public abstract class AbstractActivity extends Activity implements OnItemSelecte
         mCameraHelper = null;
         
         mCodecHelper.release();
-        mCodecHelper = null;
+        mCodecHelper  = null;
         
-        mDisplayView    = null;
-        mPreviewView    = null;
-        mResolution     = null;
+        mDisplayView  = null;
+        mPreviewView  = null;
+        mResolution   = null;
 
         super.onDestroy();
     }

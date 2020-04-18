@@ -98,7 +98,7 @@ abstract class AbstractCameraHelper implements Camera.PreviewCallback
         {
             Camera.Parameters parameters = mCamera.getParameters();
             mSupportedSizes = CameraKit.getSupportedSizes(parameters);
-            Camera.Size bestSize = CameraKit.getCameraBestPreviewSize(parameters, DEFAULT_PREVIEW_WIDTH, DEFAULT_PREVIEW_HEIGHT);
+            Camera.Size bestSize = CameraKit.getCameraBestPreviewSize(parameters, width, height);
             parameters.setPreviewSize(bestSize.width, bestSize.height);
             parameters.setPreviewFormat(PREVIEW_FORMAT);
             parameters.setPreviewFpsRange(MIN_FPS*1000, MAX_FPS*1000);
