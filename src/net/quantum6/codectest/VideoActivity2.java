@@ -430,7 +430,7 @@ public class VideoActivity2 extends Activity
     }
 
 
-    MediaCodec decoder;
+    private MediaCodec decoder;
 
     private final byte[] csd0 = 
         {
@@ -451,35 +451,36 @@ public class VideoActivity2 extends Activity
         Log.d("sakalog", "create decoder.");
         if (decoder == null)
         {
-        try
-        {
-        decoder = MediaCodec.createDecoderByType("video/avc");
+            try
+            {
+                decoder = MediaCodec.createDecoderByType("video/avc");
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+                return;
+            }
+            MediaFormat format = MediaFormat.createVideoFormat("video/avc", Width, Height);
+            format.setByteBuffer("csd-0", ByteBuffer.wrap(csd0));
+            Log.d("sakalog", "Configuring decoder with input format : " + format);
+            decoder.configure(
+                    format,     //The format of the input data (decoder)
+                    mDecodeSurface.getHolder().getSurface(),    //a surface on which to render the output of this decoder.
+                    null,       //a crypto object to facilitate secure decryption of the media data.
+                    0           //configure the component as an decoder.
+                    );
+            decoder.start();
         }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-        MediaFormat format = MediaFormat.createVideoFormat("video/avc", Width, Height);
-        format.setByteBuffer("csd-0", ByteBuffer.wrap(csd0));
-        Log.d("sakalog", "Configuring decoder with input format : " + format);
-        decoder.configure(
-                format,     //The format of the input data (decoder)
-                mDecodeSurface.getHolder().getSurface(),    //a surface on which to render the output of this decoder.
-                null,       //a crypto object to facilitate secure decryption of the media data.
-                0           //configure the component as an decoder.
-                );
-        decoder.start();
-        return;
-    } else {
+        
         // Codec(エンコーダ)からのOutputバッファが、h.264符号化データである場合、Codec(デコーダ)へ入力する
         int decIndex = decoder.dequeueInputBuffer(-1);
-        //Log.d("sakalog", "decoder input buf index " + decIndex);
-        decoder.getInputBuffers()[decIndex].clear();
-        decoder.getInputBuffers()[decIndex].put(buf);
-        decoder.queueInputBuffer(decIndex, 0, buf.capacity(), 0, 0);
-    }
-    
-    
+        if (decIndex >= 0)
+        {
+            //Log.d("sakalog", "decoder input buf index " + decIndex);
+            decoder.getInputBuffers()[decIndex].clear();
+            decoder.getInputBuffers()[decIndex].put(buf);
+            decoder.queueInputBuffer(decIndex, 0, buf.capacity(), 0, 0);
+        }
     }
     
     int numOutputFrames = 0;
@@ -494,12 +495,15 @@ public class VideoActivity2 extends Activity
     {
         // Codec(デコーダ)の出力バッファ(rawデータ)のインデックスを取得
         if (decoder == null)
+        {
             return;
+        }
         
         MediaCodec.BufferInfo info = new MediaCodec.BufferInfo();
         int res = decoder.dequeueOutputBuffer(info, 5000);
 
-        if (res >= 0) {
+        if (res >= 0)
+        {
             //Log.d("sakalog", "decoder output buf index " + outputBufIndex);
             int outputBufIndex = res;
             ByteBuffer buf = decoder.getOutputBuffers()[outputBufIndex];
@@ -510,7 +514,6 @@ public class VideoActivity2 extends Activity
             // 使い終わったOutputバッファはCodec(デコーダ)に戻す
             decoder.releaseOutputBuffer(outputBufIndex, true);
         }
-
     }
     
     private class EncDecThread extends Thread {
@@ -615,7 +618,7 @@ public class VideoActivity2 extends Activity
             // Codec(エンコーダ)のインスタンスを作成
             try
             {
-            encoder = MediaCodec.createByCodecName(codecInfo.getName());
+                encoder = MediaCodec.createByCodecName(codecInfo.getName());
             }
             catch (Exception e)
             {

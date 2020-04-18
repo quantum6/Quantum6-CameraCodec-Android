@@ -52,7 +52,7 @@ abstract class AbstractCodecHelper
     
     public synchronized void clearCodec()
     {
-    	isInited     = false;
+        isInited     = false;
         mFrameWidth  = 0;
         mFrameHeight = 0;
         
@@ -71,12 +71,12 @@ abstract class AbstractCodecHelper
     
     public void initCodec(int width, int height)
     {
-    	mFrameWidth  = width;
-    	mFrameHeight = height;
+        mFrameWidth  = width;
+        mFrameHeight = height;
         if (0 == mFrameWidth
-        		|| 0 == mFrameHeight
-        		|| isInited
-        		|| getSurface() == null )
+                || 0 == mFrameHeight
+                || isInited
+                || getSurface() == null )
         {
             return;
         }
@@ -115,6 +115,7 @@ abstract class AbstractCodecHelper
         }
     }
     
+
     /*
     private final byte[] csd0 = 
         {
@@ -190,7 +191,7 @@ abstract class AbstractCodecHelper
         {
             mFrameData.setData(data);
             dataLen = mEncoder.process(mFrameData, mEncodedData);
-            Log.e(TAG, "encoded length=" + dataLen);
+            //Log.e(TAG, "encoded length=" + dataLen);
         }
 
         if (dataLen <= 0)
@@ -200,17 +201,15 @@ abstract class AbstractCodecHelper
 
         if (null == mDecoder)
         {
-            Log.d(TAG, "mEncodedData.mDataArray[4]="+Integer.toHexString(mEncodedData.mDataArray[4]));
             mDecoderWidth  = mFrameWidth;
             mDecoderHeight = mFrameHeight;
-            Log.d(TAG, "initCodec() mDecoder=("+mDecoderWidth+", "+mDecoderHeight+"), ("+mFrameWidth+", "+mFrameHeight+")");
             mDecodedData = new MediaCodecData(mDecoderWidth, mDecoderHeight);
             mDecoder     = new AndroidVideoDecoder(getSurface(), mDecoderWidth, mDecoderHeight);
+            return;
         }
-        
         mEncodedData.mDataSize = dataLen;
-    	dataLen = mDecoder.process(mEncodedData, mDecodedData);
-        Log.d(TAG, "decoded length first=" + dataLen);
+        dataLen = mDecoder.process(mEncodedData, mDecodedData);
+        //Log.d(TAG, "decoded length first=" + dataLen);
         
         /*
         try
@@ -227,8 +226,8 @@ abstract class AbstractCodecHelper
 
     private void reset()
     {
-    	clearCodec();
-    	isInited      = false;
+        clearCodec();
+        isInited      = false;
 
         mFpsStartTime = 0;
         mFpsCounter   = 0;
