@@ -5,7 +5,6 @@ import android.view.Surface;
 
 import net.quantum6.mediacodec.AndroidVideoDecoder;
 import net.quantum6.mediacodec.AndroidVideoEncoder;
-import net.quantum6.mediacodec.H264SpsParser;
 import net.quantum6.mediacodec.MediaCodecData;
 
 /**
@@ -115,6 +114,72 @@ abstract class AbstractCodecHelper
             mFpsCounter++;
         }
     }
+    
+    /*
+    private final byte[] csd0 = 
+        {
+            0x0, 0x0, 0x0, 0x1, 0x67, 0x42, 0x0, 0x29, (byte)0x8d, (byte)0x8d, 0x40, 0x28, 0x2, (byte)0xdd, 0x0, (byte)0xf0, (byte)0x88, 0x45, 0x38,
+            0x0, 0x0, 0x0, 0x1, 0x68, (byte)0xca, 0x43, (byte)0xc8 
+        };
+    
+    private MediaCodec decoder;
+    private MediaCodec.BufferInfo info = new MediaCodec.BufferInfo();
+    
+    private void decode(byte[] data, int size)
+    {
+        if (decoder == null)
+        {
+            try
+            {
+                decoder = MediaCodec.createDecoderByType(MediaCodecKit.MIME_CODEC_H264);
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+                return;
+            }
+            
+            MediaFormat format = MediaFormat.createVideoFormat(MediaCodecKit.MIME_CODEC_H264, mFrameWidth, mFrameHeight);
+            format.setByteBuffer("csd-0", ByteBuffer.wrap(csd0));
+            decoder.configure(
+                    format,
+                    getSurface(),
+                    null,
+                    0
+                    );
+            decoder.start();
+        }
+        int decIndex = decoder.dequeueInputBuffer(-1);
+        if (decIndex > 0)
+        {
+            ByteBuffer decBuffer = decoder.getInputBuffers()[decIndex];
+            decBuffer.clear();
+            decBuffer.put(data, 0, size);
+            
+            decoder.queueInputBuffer(decIndex, 0, size, 0, 0);
+        }
+        
+        int    res = decoder.dequeueOutputBuffer(info, 5000);
+        if (res >= 0)
+        {
+            int outputBufIndex = res;
+            ByteBuffer buf2 = decoder.getOutputBuffers()[outputBufIndex];
+
+            buf2.position(info.offset);
+            buf2.limit(info.offset + info.size);
+
+            decoder.releaseOutputBuffer(outputBufIndex, true);
+        }
+        else if (res == MediaCodec.INFO_OUTPUT_BUFFERS_CHANGED)
+        {
+            //
+        }
+        else if (res == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED)
+        {
+            //
+        }
+    }
+    */
 
     public void processData(final byte[] data)
     {
@@ -125,7 +190,7 @@ abstract class AbstractCodecHelper
         {
             mFrameData.setData(data);
             dataLen = mEncoder.process(mFrameData, mEncodedData);
-            Log.d(TAG, "encoded length=" + dataLen);
+            Log.e(TAG, "encoded length=" + dataLen);
         }
 
         if (dataLen <= 0)
@@ -135,33 +200,29 @@ abstract class AbstractCodecHelper
 
         if (null == mDecoder)
         {
-            int[] size = H264SpsParser.getSizeFromSps(mEncodedData.mDataArray);
-            if (size != null)
-            {
-                mDecoderWidth  = size[0];
-                mDecoderHeight = size[1];
-            }
-            else
-            {
-                mDecoderWidth  = mFrameWidth;
-                mDecoderHeight = mFrameHeight;
-            }
+            Log.d(TAG, "mEncodedData.mDataArray[4]="+Integer.toHexString(mEncodedData.mDataArray[4]));
+            mDecoderWidth  = mFrameWidth;
+            mDecoderHeight = mFrameHeight;
             Log.d(TAG, "initCodec() mDecoder=("+mDecoderWidth+", "+mDecoderHeight+"), ("+mFrameWidth+", "+mFrameHeight+")");
             mDecodedData = new MediaCodecData(mDecoderWidth, mDecoderHeight);
             mDecoder     = new AndroidVideoDecoder(getSurface(), mDecoderWidth, mDecoderHeight);
         }
         
+        mEncodedData.mDataSize = dataLen;
     	dataLen = mDecoder.process(mEncodedData, mDecodedData);
         Log.d(TAG, "decoded length first=" + dataLen);
-    	if (dataLen == -1)
-    	{
-            Log.d(TAG, "release and new AndroidVideoDecoder");
-    	    //Thread.dumpStack();
-    	    mDecoder.release();
-            mDecoder = new AndroidVideoDecoder(getSurface(), mDecoderWidth, mDecoderHeight);
-            dataLen = mDecoder.process(mEncodedData, mDecodedData);
-            Log.d(TAG, "decoded length second=" + dataLen);
-    	}
+        
+        /*
+        try
+        {
+            decode(mEncodedData.mDataArray, dataLen);
+        }
+        catch (Exception e)
+        {
+            Log.e(TAG, "Exception="+e);
+            e.printStackTrace();
+        }
+        */
     }
 
     private void reset()

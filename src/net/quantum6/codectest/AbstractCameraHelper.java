@@ -3,6 +3,7 @@ package net.quantum6.codectest;
 import java.util.List;
 
 import net.quantum6.kit.CameraKit;
+import net.quantum6.kit.Log;
 
 import android.graphics.ImageFormat;
 import android.hardware.Camera;
@@ -19,9 +20,6 @@ abstract class AbstractCameraHelper implements Camera.PreviewCallback
     public  final static int PREVIEW_FORMAT = ImageFormat.NV21;
     public  final static int frameRate      = 30;
 
-    private final static int DEFAULT_PREVIEW_WIDTH  = 640;
-    private final static int DEFAULT_PREVIEW_HEIGHT = 360;
-    
     private final static int MIN_FPS        = 10;
     private final static int MAX_FPS        = 60;
     
@@ -40,6 +38,9 @@ abstract class AbstractCameraHelper implements Camera.PreviewCallback
     private Camera      mCamera;
     List<Camera.Size>   mSupportedSizes;
     Camera.Size         mPreviewSize;
+    
+    int mWantedWidth;
+    int mWantedHeight;
 
     AbstractCodecHelper mCodecHelper;
 
@@ -54,7 +55,7 @@ abstract class AbstractCameraHelper implements Camera.PreviewCallback
 
     protected abstract void clearSurface();
 
-    public void openCamera(int width, int height)
+    public void changeResolution(int width, int height)
     {
         //如果没有变化，返回。
         if (null != mPreviewSize && width == mPreviewSize.width && height == mPreviewSize.height)
@@ -62,7 +63,12 @@ abstract class AbstractCameraHelper implements Camera.PreviewCallback
             return;
         }
         reset();
-        initCamera(width, height);
+        
+        mWantedWidth = width;
+        mWantedHeight= height;
+        
+        initCamera(mWantedWidth, mWantedHeight);
+        mCodecHelper.initCodec(this.mPreviewSize.width, this.mPreviewSize.height);
     }
     
     protected void initCamera(int width, int height)
@@ -143,14 +149,11 @@ abstract class AbstractCameraHelper implements Camera.PreviewCallback
     	{
     		return;
     	}
-    	
-    	{
-            if (null != mCodecHelper)
-            {
-            	mCodecHelper.processData(data);
-            }
-    	}
-    	
+
+        if (null != mCodecHelper)
+        {
+            mCodecHelper.processData(data);
+        }
         if (null != mCamera)
         {
             mCamera.addCallbackBuffer(data);
@@ -178,7 +181,7 @@ abstract class AbstractCameraHelper implements Camera.PreviewCallback
         }
     }
 
-    private void reset()
+    protected void reset()
     {
         closeCamera();
         mCodecHelper.clearCodec();
