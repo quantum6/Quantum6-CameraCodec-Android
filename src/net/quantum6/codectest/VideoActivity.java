@@ -217,7 +217,8 @@ public final class VideoActivity extends Activity implements OnItemSelectedListe
         int width       = Integer.parseInt(selected.substring(0, pos));
         int height      = Integer.parseInt(selected.substring(pos+1).trim());
 
-        mCameraHelper.openCamera(width, height);
+        mCameraHelper.changeResolution(width, height);
+        initPreviewView();
         mHandler.sendEmptyMessage(MESSAGE_CHANGE_SHAPE);
     }
 

@@ -65,16 +65,14 @@ final class CameraHelper extends AbstractCameraHelper implements SurfaceHolder.C
     @Override
     public void surfaceChanged(SurfaceHolder holder, int format, int width, int height)
     {
-        //清除原来跟surface相关的
-    	mCodecHelper.clearCodec();
-        
         Log.d(TAG, "surfaceChanged()");
-      	mPreviewHolder = holder;
+        if (null != holder)
+        {
+            mPreviewHolder = holder;
+        }
         // AvcCodec.listCodec();
         //必须初始化摄像头，以获得各种分辨率。
-        initCamera(0, 0);
-        
-        mCodecHelper.initCodec(this.mPreviewSize.width, this.mPreviewSize.height);
+        changeResolution(mWantedWidth, mWantedHeight);
     }
 
     @Override

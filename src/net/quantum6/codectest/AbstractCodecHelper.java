@@ -1,5 +1,12 @@
 package net.quantum6.codectest;
 
+import java.io.BufferedOutputStream;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
+import java.nio.ByteBuffer;
+
+import android.media.MediaCodec;
+import android.media.MediaFormat;
 import android.util.Log;
 import android.view.Surface;
 
@@ -62,6 +69,11 @@ abstract class AbstractCodecHelper
             mDecoder.release();
             mDecoder = null;
         }
+        if (null != decoder)
+        {
+            decoder.release();
+            decoder = null;
+        }
 
         if (null != mEncoder)
         {
@@ -115,6 +127,83 @@ abstract class AbstractCodecHelper
             mFpsCounter++;
         }
     }
+    
+    MediaCodec decoder;
+    ByteBuffer[] decoderInputBuffers = null;
+    ByteBuffer[] decoderOutputBuffers = null;
+    MediaCodec.BufferInfo info = new MediaCodec.BufferInfo();
+    private void decode(byte[] data, int size)
+    {
+        ByteBuffer buf = ByteBuffer.wrap(data, 0, size);
+        buf.position(0);
+        
+        Log.d("sakalog", "create decoder.");
+        if (decoder == null)
+        {
+            if (data[4] != 0x67)
+            {
+                return;
+            }
+
+        try
+        {
+        decoder = MediaCodec.createDecoderByType("video/avc");
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        
+        MediaFormat format = MediaFormat.createVideoFormat("video/avc", mFrameWidth, mFrameHeight);
+        format.setByteBuffer("csd-0", buf);
+        Log.d("sakalog", "Configuring decoder with input format : " + format);
+        decoder.configure(
+                format,     //The format of the input data (decoder)
+                getSurface(),    //a surface on which to render the output of this decoder.
+                null,       //a crypto object to facilitate secure decryption of the media data.
+                0           //configure the component as an decoder.
+                );
+        decoder.start();
+        decoderInputBuffers  = decoder.getInputBuffers();
+        decoderOutputBuffers = decoder.getOutputBuffers();
+        return;
+    } else {
+
+        // Codec(エンコーダ)からのOutputバッファが、h.264符号化データである場合、Codec(デコーダ)へ入力する
+        int decIndex = decoder.dequeueInputBuffer(-1);
+        //Log.d("sakalog", "decoder input buf index " + decIndex);
+        decoderInputBuffers[decIndex].clear();
+        decoderInputBuffers[decIndex].put(data, 0, size);
+        decoder.queueInputBuffer(decIndex, 0, size, 0, 0);
+    }
+    
+    
+        int    res = decoder.dequeueOutputBuffer(info, 5000);
+Log.d(TAG, "dequeueOutputBuffer="+res);
+        if (res >= 0) {
+            //Log.d("sakalog", "decoder output buf index " + outputBufIndex);
+            int outputBufIndex = res;
+            ByteBuffer buf2 = decoderOutputBuffers[outputBufIndex];
+
+            buf2.position(info.offset);
+            buf2.limit(info.offset + info.size);
+
+            if (info.size > 0) {
+                //errors = checkFrame(buf, info, oformat, width, height, threshold);
+            }
+
+            // 使い終わったOutputバッファはCodec(デコーダ)に戻す
+            decoder.releaseOutputBuffer(outputBufIndex, true);
+        }
+    else if (res == MediaCodec.INFO_OUTPUT_BUFFERS_CHANGED) {
+        decoderOutputBuffers = decoder.getOutputBuffers();
+
+        Log.d("sakalog", "decoder output buffers have changed.");
+    } else if (res == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED) {
+        Log.d("sakalog", "decoder output format has changed to " + decoder.getOutputFormat());
+    }
+
+    }
 
     public void processData(final byte[] data)
     {
@@ -133,35 +222,34 @@ abstract class AbstractCodecHelper
             return;
         }
 
+        /*
         if (null == mDecoder)
         {
-            int[] size = H264SpsParser.getSizeFromSps(mEncodedData.mDataArray);
-            if (size != null)
+            Log.d(TAG, "mEncodedData.mDataArray[4]="+Integer.toHexString(mEncodedData.mDataArray[4]));
+            if (mEncodedData.mDataArray[4] != 0x67)
             {
-                mDecoderWidth  = size[0];
-                mDecoderHeight = size[1];
+                return;
             }
-            else
-            {
-                mDecoderWidth  = mFrameWidth;
-                mDecoderHeight = mFrameHeight;
-            }
+            mDecoderWidth  = mFrameWidth;
+            mDecoderHeight = mFrameHeight;
             Log.d(TAG, "initCodec() mDecoder=("+mDecoderWidth+", "+mDecoderHeight+"), ("+mFrameWidth+", "+mFrameHeight+")");
             mDecodedData = new MediaCodecData(mDecoderWidth, mDecoderHeight);
-            mDecoder     = new AndroidVideoDecoder(getSurface(), mDecoderWidth, mDecoderHeight);
+            ByteBuffer sps = ByteBuffer.wrap(mEncodedData.mDataArray, 0, mEncodedData.mDataSize);
+            mDecoder     = new AndroidVideoDecoder(getSurface(), mDecoderWidth, mDecoderHeight, sps);
+            return;
         }
+            */
         
-    	dataLen = mDecoder.process(mEncodedData, mDecodedData);
-        Log.d(TAG, "decoded length first=" + dataLen);
-    	if (dataLen == -1)
-    	{
-            Log.d(TAG, "release and new AndroidVideoDecoder");
-    	    //Thread.dumpStack();
-    	    mDecoder.release();
-            mDecoder = new AndroidVideoDecoder(getSurface(), mDecoderWidth, mDecoderHeight);
-            dataLen = mDecoder.process(mEncodedData, mDecodedData);
-            Log.d(TAG, "decoded length second=" + dataLen);
-    	}
+    	//dataLen = mDecoder.process(mEncodedData, mDecodedData);
+        //Log.d(TAG, "decoded length first=" + dataLen);
+        try
+        {
+            decode(mEncodedData.mDataArray, mEncodedData.mDataSize);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
     }
 
     private void reset()
