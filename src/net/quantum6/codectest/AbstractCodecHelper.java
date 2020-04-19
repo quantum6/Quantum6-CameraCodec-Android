@@ -3,6 +3,7 @@ package net.quantum6.codectest;
 import android.util.Log;
 import android.view.Surface;
 
+import net.quantum6.fps.FpsCounter;
 import net.quantum6.mediacodec.AndroidVideoDecoder;
 import net.quantum6.mediacodec.AndroidVideoEncoder;
 import net.quantum6.mediacodec.MediaCodecData;
@@ -21,15 +22,10 @@ abstract class AbstractCodecHelper
     private final static int DEFAULT_FPS      = 60;
     private final static int DEFAULT_BIT_RATE = 1000*1000;
 
-    /**
-     * 当前一秒的帧数。
-     */
-    private long mFpsStartTime  = 0;
-    private int  mFpsCounter    = 0;
-    public  int  mFpsCurrent    = 0;
-    
     private boolean  isInited   = false;
 
+    FpsCounter          mDataFps   = new FpsCounter();
+    FpsCounter          mEncodeFps = new FpsCounter();
 
     protected int               mFrameWidth;
     protected int               mFrameHeight;
@@ -90,32 +86,9 @@ abstract class AbstractCodecHelper
             mEncoder     = new AndroidVideoEncoder(mFrameWidth, mFrameHeight, DEFAULT_FPS, DEFAULT_BIT_RATE);
         }
         
-        isInited = true;
+        isInited   = true;
     }
     
-    private void calculateFps()
-    {
-        long currentTime = System.currentTimeMillis();
-        if (0 == mFpsStartTime)
-        {
-            mFpsCurrent   = 0;
-            mFpsCounter   = 1;
-            mFpsStartTime = currentTime;
-            return;
-        }
-        if (currentTime - mFpsStartTime >= FPS_MS_TIME)
-        {
-            mFpsCurrent   = mFpsCounter;
-            mFpsCounter   = 1;
-            mFpsStartTime = currentTime;
-        }
-        else
-        {
-            mFpsCounter++;
-        }
-    }
-    
-
     /*
     private final byte[] csd0 = 
         {
@@ -184,7 +157,7 @@ abstract class AbstractCodecHelper
 
     public void processData(final byte[] data)
     {
-        calculateFps();
+        mDataFps.count();
 
         int dataLen = 0;
         if (null != mEncoder)
@@ -199,12 +172,14 @@ abstract class AbstractCodecHelper
             return;
         }
 
+        mEncodeFps.count();
+        
         if (null == mDecoder)
         {
             mDecoderWidth  = mFrameWidth;
             mDecoderHeight = mFrameHeight;
-            mDecodedData = new MediaCodecData(mDecoderWidth, mDecoderHeight);
-            mDecoder     = new AndroidVideoDecoder(getSurface(), mDecoderWidth, mDecoderHeight);
+            mDecodedData   = new MediaCodecData(mDecoderWidth, mDecoderHeight);
+            mDecoder       = new AndroidVideoDecoder(getSurface(), mDecoderWidth, mDecoderHeight);
             return;
         }
         mEncodedData.mDataSize = dataLen;
@@ -229,9 +204,8 @@ abstract class AbstractCodecHelper
         clearCodec();
         isInited      = false;
 
-        mFpsStartTime = 0;
-        mFpsCounter   = 0;
-        mFpsCurrent   = 0;
+        mDataFps.reset();
+        mEncodeFps.reset();
     }
     
     public void release()
