@@ -2,6 +2,7 @@ package net.quantum6.codectest;
 
 import java.util.List;
 
+import net.quantum6.kit.CameraDataThread;
 import net.quantum6.kit.CameraKit;
 import net.quantum6.kit.Log;
 
@@ -13,7 +14,7 @@ import android.hardware.Camera;
  * @author PC
  * 
  */
-abstract class AbstractCameraHelper implements Camera.PreviewCallback
+abstract class AbstractCameraHelper
 {
     private final static String TAG         = AbstractCameraHelper.class.getCanonicalName();
 
@@ -130,8 +131,8 @@ abstract class AbstractCameraHelper implements Camera.PreviewCallback
             {
                 mCamera.addCallbackBuffer(new byte[bufSize]);
             }
-            mCamera.setPreviewCallbackWithBuffer(this);
-
+            mCamera.setPreviewCallbackWithBuffer(dataThread);
+            new Thread(dataThread).start();
             mCamera.startPreview();
         }
         catch (Exception e)
@@ -141,26 +142,23 @@ abstract class AbstractCameraHelper implements Camera.PreviewCallback
         isInited = true;
     }
 
-    //{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{ 
-    @Override
-    public void onPreviewFrame(byte[] data, Camera camera)
+    private CameraDataThread dataThread = new CameraDataThread()
     {
-    	if (data == null || data.length == 0)
-    	{
-    		return;
-    	}
-
-        if (null != mCodecHelper)
+        @Override
+        public void onCameraDataArrived(final byte[] data, Camera camera)
         {
-            mCodecHelper.processData(data);
-        }
-        if (null != mCamera)
-        {
-            mCamera.addCallbackBuffer(data);
-        }
-    }
+            if (data == null || data.length == 0)
+            {
+                return;
+            }
 
-    //}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}
+            if (null != mCodecHelper)
+            {
+                mCodecHelper.processData(data);
+            }
+        }
+    };
+    
     
     private void closeCamera()
     {
@@ -168,6 +166,7 @@ abstract class AbstractCameraHelper implements Camera.PreviewCallback
         {
             return;
         }
+        dataThread.stop();
         try
         {
             mCamera.setPreviewCallback(null); // ！！这个必须在前，不然退出出错
