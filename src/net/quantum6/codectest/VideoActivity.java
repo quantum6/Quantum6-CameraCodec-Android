@@ -132,8 +132,8 @@ public final class VideoActivity extends Activity implements OnItemSelectedListe
                     {
                         mInfoText.setText("("+mCameraHelper.mPreviewSize.width+", "+mCameraHelper.mPreviewSize.height
                                 +")"
-                                +", data="  +mCodecHelper.mDataFps.getFpsAndClear()
-                                +", encode="+mCodecHelper.mEncodeFps.getFpsAndClear()
+                                +", camera=" + mCameraHelper.getFps()
+                                +", encode=" + mCodecHelper.getFps()
                                 +", "+SystemKit.getText(getApplicationContext()));
                         mHandler.sendEmptyMessageDelayed(MESSAGE_CHECK_FPS, TIME_DELAY);
                     }

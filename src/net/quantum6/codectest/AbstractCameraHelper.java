@@ -159,6 +159,10 @@ abstract class AbstractCameraHelper
         }
     };
     
+    public int getFps()
+    {
+        return dataThread.getFps();
+    }
     
     private void closeCamera()
     {

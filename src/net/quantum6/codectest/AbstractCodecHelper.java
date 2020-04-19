@@ -24,7 +24,6 @@ abstract class AbstractCodecHelper
 
     private boolean  isInited   = false;
 
-    FpsCounter          mDataFps   = new FpsCounter();
     FpsCounter          mEncodeFps = new FpsCounter();
 
     protected int               mFrameWidth;
@@ -87,6 +86,11 @@ abstract class AbstractCodecHelper
         }
         
         isInited   = true;
+    }
+    
+    public int getFps()
+    {
+        return mEncodeFps.getFpsAndClear();
     }
     
     /*
@@ -157,8 +161,6 @@ abstract class AbstractCodecHelper
 
     public void processData(final byte[] data)
     {
-        mDataFps.count();
-
         int dataLen = 0;
         if (null != mEncoder)
         {
@@ -204,7 +206,6 @@ abstract class AbstractCodecHelper
         clearCodec();
         isInited      = false;
 
-        mDataFps.reset();
         mEncodeFps.reset();
     }
     
