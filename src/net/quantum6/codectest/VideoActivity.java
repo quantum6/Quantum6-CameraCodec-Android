@@ -134,7 +134,7 @@ public final class VideoActivity extends Activity implements OnItemSelectedListe
                                 +")"
                                 +", camera=" + mCameraHelper.getFps()
                                 +", encode=" + mCodecHelper.getFps()
-                                +", "+SystemKit.getText(getApplicationContext()));
+                                +"\n"+SystemKit.getText(getApplicationContext()));
                         mHandler.sendEmptyMessageDelayed(MESSAGE_CHECK_FPS, TIME_DELAY);
                     }
                     break;
