@@ -59,8 +59,11 @@ abstract class AbstractCameraHelper
 
     public void toggleCamera()
     {
-        useBackCamera = !useBackCamera;
-        mPreviewSize = null;
+        if (Camera.getNumberOfCameras() > 1)
+        {
+            useBackCamera = !useBackCamera;
+            mPreviewSize = null;
+        }
     }
     
     public void changeResolution(int width, int height)
