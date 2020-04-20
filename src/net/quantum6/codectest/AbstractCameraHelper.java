@@ -61,8 +61,9 @@ abstract class AbstractCameraHelper
     {
         if (Camera.getNumberOfCameras() > 1)
         {
-            useBackCamera = !useBackCamera;
-            mPreviewSize = null;
+            useBackCamera   = !useBackCamera;
+            mPreviewSize    = null;
+            mSupportedSizes = null;
         }
     }
     
