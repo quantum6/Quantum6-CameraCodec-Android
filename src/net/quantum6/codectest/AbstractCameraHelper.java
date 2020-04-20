@@ -33,6 +33,7 @@ abstract class AbstractCameraHelper
     private final static int MIN_VIDEO_SIZE = 100;
 
 
+    private boolean useBackCamera = true;
     boolean         isInited                = false;
 
 
@@ -56,6 +57,12 @@ abstract class AbstractCameraHelper
 
     protected abstract void clearSurface();
 
+    public void toggleCamera()
+    {
+        useBackCamera = !useBackCamera;
+        mPreviewSize = null;
+    }
+    
     public void changeResolution(int width, int height)
     {
         //如果没有变化，返回。
@@ -80,20 +87,11 @@ abstract class AbstractCameraHelper
             return;
         }
         
-        try
-        {
-            mCamera = Camera.open();
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-
         if (null == mCamera)
         {
             try
             {
-                mCamera = Camera.open(0);
+                mCamera = Camera.open(useBackCamera ? 0 : 1);
             }
             catch (Exception e)
             {

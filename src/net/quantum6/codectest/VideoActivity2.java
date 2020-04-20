@@ -45,7 +45,7 @@ public class VideoActivity2 extends Activity
 
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
-        setContentView(R.layout.main);
+        setContentView(R.layout.video_activity2);
 
         // エンコーダ入力映像をカメラから取得するためのカメラプレビュー用SurfaceViewを準備
         mCameraSurface = (SurfaceView)findViewById(R.id.CameraSurface);

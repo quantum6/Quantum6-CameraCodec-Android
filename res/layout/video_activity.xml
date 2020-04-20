@@ -4,12 +4,13 @@
     android:layout_height="match_parent"
     android:background="#333333"
     >
+    
     <SurfaceView 
         android:id="@+id/displayview"
         android:layout_width="match_parent"
     	android:layout_height="match_parent"
     	/>
-    
+
     <SurfaceView 
         android:id="@+id/preview"
         android:layout_width="250dp"
@@ -23,8 +24,6 @@
         android:id="@+id/info_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentLeft="true"
         android:layout_margin="5dp"
         android:background="#88000000"
         android:textColor="@android:color/white"
@@ -34,12 +33,21 @@
     
     <Spinner
         android:id="@+id/resolution"
-        android:layout_width="400dp"
+        android:layout_width="200dp"
     	android:layout_height="35dp"
     	android:layout_below="@id/info_text"
     	android:layout_margin="5dp"
     	android:background="#888888"
     	android:textSize="20sp"
     	/>
+    
+    <Button
+        android:id="@+id/toogle"
+        android:text="Switch"
+        android:layout_width="100dp"
+    	android:layout_height="50dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        />
     
 </RelativeLayout>

@@ -12,9 +12,11 @@ import android.view.KeyEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -28,7 +30,7 @@ import net.quantum6.kit.SystemKit;
  * @author PC
  *
  */
-public final class VideoActivity extends Activity implements OnItemSelectedListener
+public final class VideoActivity extends Activity implements OnItemSelectedListener, OnClickListener
 {
     private final static String TAG = VideoActivity.class.getCanonicalName();
 
@@ -57,6 +59,29 @@ public final class VideoActivity extends Activity implements OnItemSelectedListe
     protected AbstractCodecHelper  mCodecHelper;
     private int mSelectedIndex      = -1;
     
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState)
+    {
+        super.onCreate(savedInstanceState);
+        setContentView(getLayout());
+
+        initHelpers();
+        mCameraHelper.mCodecHelper = mCodecHelper;
+
+        mDisplayView = initDisplayView();
+        mPreviewView = initPreviewView();
+
+        mResolution = (Spinner)this.findViewById(R.id.resolution);
+        mResolution.requestFocus();
+        
+        mInfoText = (TextView)this.findViewById(R.id.info_text);
+        
+        Button toggle = (Button)this.findViewById(R.id.toogle);
+        toggle.setOnClickListener(this);
+        
+        mHandler.sendEmptyMessageDelayed(MESSAGE_CHECK_INIT, TIME_DELAY);
+    }
 
     //{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{
     protected int getLayout()
@@ -96,26 +121,15 @@ public final class VideoActivity extends Activity implements OnItemSelectedListe
     }
     //}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}
     
+    //{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{
     @Override
-    protected void onCreate(Bundle savedInstanceState)
+    public void onClick(android.view.View view)
     {
-        super.onCreate(savedInstanceState);
-        setContentView(getLayout());
-
-        initHelpers();
-    	mCameraHelper.mCodecHelper = mCodecHelper;
-
-        mDisplayView = initDisplayView();
-        mPreviewView = initPreviewView();
-
-        mResolution = (Spinner)this.findViewById(R.id.resolution);
-        mResolution.requestFocus();
-        
-        mInfoText = (TextView)this.findViewById(R.id.info_text);
-        
-        mHandler.sendEmptyMessageDelayed(MESSAGE_CHECK_INIT, TIME_DELAY);
+        mCameraHelper.toggleCamera();
+        changeResolution();
     }
-
+    //}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}
+    
     private Handler mHandler = new Handler()
     {
         @Override
@@ -184,6 +198,17 @@ public final class VideoActivity extends Activity implements OnItemSelectedListe
         }
     };
     
+    private void changeResolution()
+    {
+        String selected = (String) mResolution.getItemAtPosition(mSelectedIndex);
+        selected        = selected.substring(selected.indexOf('(')+1, selected.indexOf(')'));
+        int pos         = selected.indexOf(',');
+        int width       = Integer.parseInt(selected.substring(0, pos));
+        int height      = Integer.parseInt(selected.substring(pos+1).trim());
+
+        mCameraHelper.changeResolution(width, height);
+    }
+    
     /**
      * 根据比例调整View的大小，保证比例协调。
      * @param view
@@ -213,13 +238,8 @@ public final class VideoActivity extends Activity implements OnItemSelectedListe
         }
         
         mSelectedIndex = position;
-        String selected = (String) adapterView.getItemAtPosition(position);
-        selected        = selected.substring(selected.indexOf('(')+1, selected.indexOf(')'));
-        int pos         = selected.indexOf(',');
-        int width       = Integer.parseInt(selected.substring(0, pos));
-        int height      = Integer.parseInt(selected.substring(pos+1).trim());
+        changeResolution();
 
-        mCameraHelper.changeResolution(width, height);
         initPreviewView();
         mHandler.sendEmptyMessage(MESSAGE_CHANGE_SHAPE);
     }
