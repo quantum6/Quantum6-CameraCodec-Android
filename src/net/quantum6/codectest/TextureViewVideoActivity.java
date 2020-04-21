@@ -40,7 +40,9 @@ public final class TextureViewVideoActivity extends AbstractVideoActivity
     @Override
     protected View initDisplayView()
     {
-        return null;
+        SurfaceView surfaceView = (SurfaceView) this.findViewById(R.id.displayview);
+        surfaceView.getHolder().addCallback((TextureViewCodecHelper)mCodecHelper);
+        return surfaceView;
     }
     
     @Override

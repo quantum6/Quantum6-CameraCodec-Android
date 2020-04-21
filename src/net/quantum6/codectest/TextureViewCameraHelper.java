@@ -27,7 +27,6 @@ final class TextureViewCameraHelper extends AbstractCameraHelper implements Surf
     {
     	try
     	{
-    	    camera.setPreviewTexture(null);
     		camera.setPreviewDisplay(mPreviewHolder);
     	}
     	catch (Exception e)
