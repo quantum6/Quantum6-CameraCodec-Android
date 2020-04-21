@@ -31,9 +31,9 @@ import net.quantum6.kit.SystemKit;
  * @author PC
  *
  */
-public final class VideoActivity extends Activity implements OnItemSelectedListener, OnClickListener
+public abstract class VideoActivityAbstract extends Activity implements OnItemSelectedListener, OnClickListener
 {
-    private final static String TAG = VideoActivity.class.getCanonicalName();
+    private final static String TAG = VideoActivityAbstract.class.getCanonicalName();
 
     private final static int MESSAGE_CHECK_FPS      = 1;
     private final static int MESSAGE_CHECK_INIT     = 2;
@@ -85,41 +85,15 @@ public final class VideoActivity extends Activity implements OnItemSelectedListe
     }
 
     //{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{
-    protected int getLayout()
-    {
-        return R.layout.video_activity;
-    }
     
-    protected void initHelpers()
-    {
-        if (null == mCodecHelper)
-        {
-            mCodecHelper    = new CodecHelper();
-        }
-        if (null == mCameraHelper)
-        {
-            mCameraHelper   = new CameraHelper();
-        }
-        mCameraHelper.mCodecHelper = mCodecHelper;
-    }
+    abstract protected int getLayout();
     
-    protected View initDisplayView()
-    {
-        SurfaceView surfaceView = (SurfaceView) this.findViewById(R.id.displayview);
-        surfaceView.getHolder().addCallback((CodecHelper)mCodecHelper);
-        return surfaceView;
-    }
+    abstract protected void initHelpers();
     
-    protected View initPreviewView()
-    {
-        SurfaceView surfaceView = (SurfaceView) this.findViewById(R.id.preview);
-        surfaceView.setZOrderOnTop(true);
-        SurfaceHolder previewHolder = surfaceView.getHolder();
-        previewHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
-        previewHolder.addCallback((CameraHelper)mCameraHelper);
-
-        return surfaceView;
-    }
+    abstract protected View initDisplayView();
+    
+    abstract protected View initPreviewView();
+    
     //}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}
     
     //{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{
@@ -158,7 +132,7 @@ public final class VideoActivity extends Activity implements OnItemSelectedListe
                     if (mCameraHelper.isInited)
                     {
                         addResolutions();
-                        mResolution.setOnItemSelectedListener(VideoActivity.this);
+                        mResolution.setOnItemSelectedListener(VideoActivityAbstract.this);
                         mHandler.sendEmptyMessageDelayed(MESSAGE_CHECK_FPS, TIME_DELAY);
                     }
                     else

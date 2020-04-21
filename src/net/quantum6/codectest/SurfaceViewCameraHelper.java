@@ -10,12 +10,12 @@ import android.view.SurfaceHolder;
  * @author PC
  * 
  */
-final class CameraHelper extends AbstractCameraHelper implements SurfaceHolder.Callback
+final class SurfaceViewCameraHelper extends AbstractCameraHelper implements SurfaceHolder.Callback
 {
-    private final static String TAG         = CameraHelper.class.getCanonicalName();
+    private final static String TAG         = SurfaceViewCameraHelper.class.getCanonicalName();
 
     private SurfaceHolder       mPreviewHolder;
-    CameraHelper()
+    SurfaceViewCameraHelper()
     {
         //
     }

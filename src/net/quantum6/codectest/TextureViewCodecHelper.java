@@ -10,13 +10,13 @@ import android.view.SurfaceHolder;
  * @author PC
  * 
  */
-final class CodecHelper extends AbstractCodecHelper implements SurfaceHolder.Callback
+final class TextureViewCodecHelper extends AbstractCodecHelper implements SurfaceHolder.Callback
 {
-    private final static String TAG         = CodecHelper.class.getCanonicalName();
+    private final static String TAG         = TextureViewCodecHelper.class.getCanonicalName();
 
     private SurfaceHolder       mDisplayHolder;
     
-    CodecHelper()
+    TextureViewCodecHelper()
     {
         //
     }
