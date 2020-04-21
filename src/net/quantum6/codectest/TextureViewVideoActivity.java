@@ -13,11 +13,10 @@ import net.quantum6.codectest.R;
  * @author PC
  *
  */
-public final class VideoActivitySurfaceView extends VideoActivityAbstract
+public final class TextureViewVideoActivity extends AbstractVideoActivity
 {
 
     //{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{
-    
     @Override
     protected int getLayout()
     {
@@ -29,11 +28,11 @@ public final class VideoActivitySurfaceView extends VideoActivityAbstract
     {
         if (null == mCodecHelper)
         {
-            mCodecHelper    = new SurfaceViewCodecHelper();
+            mCodecHelper    = new TextureViewCodecHelper();
         }
         if (null == mCameraHelper)
         {
-            mCameraHelper   = new SurfaceViewCameraHelper();
+            mCameraHelper   = new TextureViewCameraHelper();
         }
         mCameraHelper.mCodecHelper = mCodecHelper;
     }
@@ -41,9 +40,7 @@ public final class VideoActivitySurfaceView extends VideoActivityAbstract
     @Override
     protected View initDisplayView()
     {
-        SurfaceView surfaceView = (SurfaceView) this.findViewById(R.id.displayview);
-        surfaceView.getHolder().addCallback((SurfaceViewCodecHelper)mCodecHelper);
-        return surfaceView;
+        return null;
     }
     
     @Override
@@ -53,7 +50,7 @@ public final class VideoActivitySurfaceView extends VideoActivityAbstract
         surfaceView.setZOrderOnTop(true);
         SurfaceHolder previewHolder = surfaceView.getHolder();
         previewHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
-        previewHolder.addCallback((SurfaceViewCameraHelper)mCameraHelper);
+        previewHolder.addCallback((TextureViewCameraHelper)mCameraHelper);
 
         return surfaceView;
     }

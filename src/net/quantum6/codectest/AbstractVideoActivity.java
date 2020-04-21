@@ -31,9 +31,9 @@ import net.quantum6.kit.SystemKit;
  * @author PC
  *
  */
-public abstract class VideoActivityAbstract extends Activity implements OnItemSelectedListener, OnClickListener
+public abstract class AbstractVideoActivity extends Activity implements OnItemSelectedListener, OnClickListener
 {
-    private final static String TAG = VideoActivityAbstract.class.getCanonicalName();
+    private final static String TAG = AbstractVideoActivity.class.getCanonicalName();
 
     private final static int MESSAGE_CHECK_FPS      = 1;
     private final static int MESSAGE_CHECK_INIT     = 2;
@@ -132,7 +132,7 @@ public abstract class VideoActivityAbstract extends Activity implements OnItemSe
                     if (mCameraHelper.isInited)
                     {
                         addResolutions();
-                        mResolution.setOnItemSelectedListener(VideoActivityAbstract.this);
+                        mResolution.setOnItemSelectedListener(AbstractVideoActivity.this);
                         mHandler.sendEmptyMessageDelayed(MESSAGE_CHECK_FPS, TIME_DELAY);
                     }
                     else

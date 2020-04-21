@@ -17,28 +17,28 @@ abstract class AbstractCodecHelper
 {
     private final static String TAG      = AbstractCodecHelper.class.getCanonicalName();
 
-    private final static int FPS_MS_TIME      = 1000; 
+    protected final static int FPS_MS_TIME      = 1000; 
     
-    private final static int DEFAULT_FPS      = 60;
-    private final static int DEFAULT_BIT_RATE = 1000*1000;
+    protected final static int DEFAULT_FPS      = 60;
+    protected final static int DEFAULT_BIT_RATE = 1000*1000;
 
     private boolean  isInited   = false;
 
     FpsCounter          mEncodeFps = new FpsCounter();
 
-    protected int               mFrameWidth;
-    protected int               mFrameHeight;
-    private MediaCodecData      mFrameData;
-    private MediaCodecData      mEncodedData;
-    private AndroidVideoEncoder mEncoder;
+    protected int                 mFrameWidth;
+    protected int                 mFrameHeight;
+    protected MediaCodecData      mFrameData;
+    protected MediaCodecData      mEncodedData;
+    protected AndroidVideoEncoder mEncoder;
 
-    protected int               mDecoderWidth;
-    protected int               mDecoderHeight;
-    private MediaCodecData      mDecodedData;
-    private AndroidVideoDecoder mDecoder;
+    protected int                 mDecoderWidth;
+    protected int                 mDecoderHeight;
+    protected MediaCodecData      mDecodedData;
+    protected AndroidVideoDecoder mDecoder;
     
-    protected abstract Surface  getSurface();
-    protected abstract void     clearSurface();
+    protected abstract Surface    getSurface();
+    protected abstract void       clearSurface();
     
     AbstractCodecHelper()
     {
