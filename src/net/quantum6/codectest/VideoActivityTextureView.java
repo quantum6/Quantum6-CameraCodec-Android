@@ -28,11 +28,11 @@ public final class VideoActivityTextureView extends VideoActivityAbstract
     {
         if (null == mCodecHelper)
         {
-            mCodecHelper    = new SurfaceViewCodecHelper();
+            mCodecHelper    = new TextureViewCodecHelper();
         }
         if (null == mCameraHelper)
         {
-            mCameraHelper   = new SurfaceViewCameraHelper();
+            mCameraHelper   = new TextureViewCameraHelper();
         }
         mCameraHelper.mCodecHelper = mCodecHelper;
     }
@@ -41,7 +41,7 @@ public final class VideoActivityTextureView extends VideoActivityAbstract
     protected View initDisplayView()
     {
         SurfaceView surfaceView = (SurfaceView) this.findViewById(R.id.displayview);
-        surfaceView.getHolder().addCallback((SurfaceViewCodecHelper)mCodecHelper);
+        surfaceView.getHolder().addCallback((TextureViewCodecHelper)mCodecHelper);
         return surfaceView;
     }
     
@@ -52,7 +52,7 @@ public final class VideoActivityTextureView extends VideoActivityAbstract
         surfaceView.setZOrderOnTop(true);
         SurfaceHolder previewHolder = surfaceView.getHolder();
         previewHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
-        previewHolder.addCallback((SurfaceViewCameraHelper)mCameraHelper);
+        previewHolder.addCallback((TextureViewCameraHelper)mCameraHelper);
 
         return surfaceView;
     }

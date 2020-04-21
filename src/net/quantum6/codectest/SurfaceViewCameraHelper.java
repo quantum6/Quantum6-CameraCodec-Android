@@ -15,6 +15,7 @@ final class SurfaceViewCameraHelper extends AbstractCameraHelper implements Surf
     private final static String TAG         = SurfaceViewCameraHelper.class.getCanonicalName();
 
     private SurfaceHolder       mPreviewHolder;
+    
     SurfaceViewCameraHelper()
     {
         //

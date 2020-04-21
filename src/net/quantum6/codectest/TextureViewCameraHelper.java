@@ -1,10 +1,8 @@
 package net.quantum6.codectest;
 
-import android.graphics.SurfaceTexture;
 import android.hardware.Camera;
 import android.util.Log;
 import android.view.SurfaceHolder;
-import android.view.TextureView;
 
 /**
  * 安卓4.4上的。
@@ -12,20 +10,15 @@ import android.view.TextureView;
  * @author PC
  * 
  */
-final class TextureViewCameraHelper extends AbstractCameraHelper
+final class TextureViewCameraHelper extends AbstractCameraHelper implements SurfaceHolder.Callback
 {
     private final static String TAG         = TextureViewCameraHelper.class.getCanonicalName();
 
-    private SurfaceTexture mSurface;
+    private SurfaceHolder       mPreviewHolder;
     
     TextureViewCameraHelper()
     {
         //
-    }
-    
-    public void setTextureView(SurfaceTexture tv)
-    {
-        mSurface = tv;
     }
     
     //{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{
@@ -34,7 +27,7 @@ final class TextureViewCameraHelper extends AbstractCameraHelper
     {
     	try
     	{
-    		camera.setPreviewTexture(mSurface);
+    		camera.setPreviewDisplay(mPreviewHolder);
     	}
     	catch (Exception e)
     	{
@@ -47,7 +40,7 @@ final class TextureViewCameraHelper extends AbstractCameraHelper
     {
     	try
     	{
-    		camera.setPreviewTexture(null);
+    		camera.setPreviewDisplay(null);
     	}
     	catch (Exception e)
     	{
@@ -58,9 +51,37 @@ final class TextureViewCameraHelper extends AbstractCameraHelper
     @Override
     protected void clearSurface()
     {
-    	//
+    	mPreviewHolder = null;
     }
     
     //}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}
 
+    //{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{
+    @Override
+    public void surfaceCreated(SurfaceHolder holder)
+    {
+        Log.d(TAG, "surfaceCreated()");
+    }
+
+    @Override
+    public void surfaceChanged(SurfaceHolder holder, int format, int width, int height)
+    {
+        Log.d(TAG, "surfaceChanged()");
+        if (null != holder)
+        {
+            mPreviewHolder = holder;
+        }
+        // AvcCodec.listCodec();
+        //必须初始化摄像头，以获得各种分辨率。
+        changeResolution(mWantedWidth, mWantedHeight);
+    }
+
+    @Override
+    public void surfaceDestroyed(SurfaceHolder holder)
+    {
+        Log.d(TAG, "surfaceDestroyed()");
+        mCodecHelper.clearCodec();
+    }
+
+    //}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}
 }
