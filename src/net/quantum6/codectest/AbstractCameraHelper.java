@@ -147,7 +147,7 @@ abstract class AbstractCameraHelper
     private CameraDataThread dataThread = new CameraDataThread()
     {
         @Override
-        public void onCameraDataArrived(final byte[] data, Camera camera)
+        public void onCameraDataArrived(final byte[] data, final Camera camera)
         {
             if (data == null || data.length == 0)
             {
