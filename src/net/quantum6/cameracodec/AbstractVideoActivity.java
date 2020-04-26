@@ -100,8 +100,11 @@ public abstract class AbstractVideoActivity extends Activity implements OnItemSe
     @Override
     public void onClick(android.view.View view)
     {
+        mSelectedIndex = 0;
         mCameraHelper.toggleCamera();
+
         changeResolution();
+        addResolutions();
     }
     //}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}
     
@@ -169,19 +172,20 @@ public abstract class AbstractVideoActivity extends Activity implements OnItemSe
         int height      = Integer.parseInt(selected.substring(pos+1).trim());
 
         mCameraHelper.changeResolution(width, height);
-        addResolutions();
     }
     
     private void addResolutions()
     {
-        List<String> resolutions = new LinkedList<String>();
-        if (null != mCameraHelper.mSupportedSizes)
+        if (null == mCameraHelper.mSupportedSizes)
         {
-            for (int i = 0; i < mCameraHelper.mSupportedSizes.size(); i++)
-            {
-                Size size = mCameraHelper.mSupportedSizes.get(i);
-                resolutions.add("分辨率"+i+"=("+size.width+", "+size.height+")");
-            }
+            return;
+        }
+        
+        List<String> resolutions = new LinkedList<String>();
+        for (int i = 0; i < mCameraHelper.mSupportedSizes.size(); i++)
+        {
+            Size size = mCameraHelper.mSupportedSizes.get(i);
+            resolutions.add("分辨率"+i+"=("+size.width+", "+size.height+")");
         }
 
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(
