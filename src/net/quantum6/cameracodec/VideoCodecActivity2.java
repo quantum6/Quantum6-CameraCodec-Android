@@ -1,4 +1,4 @@
-package net.quantum6.codectest;
+package net.quantum6.cameracodec;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -18,10 +18,11 @@ import android.view.Window;
 
 import java.nio.ByteBuffer;
 
+import net.quantum6.cameracodec.R;
 import net.quantum6.kit.CameraKit;
 import net.quantum6.mediacodec.MediaCodecKit;
 
-public class VideoActivity2 extends Activity
+public class VideoCodecActivity2 extends Activity
 {
     //private static final int UseCamera = Camera.CameraInfo.CAMERA_FACING_FRONT;
     private static final int UseCamera = Camera.CameraInfo.CAMERA_FACING_BACK;
@@ -741,7 +742,7 @@ public class VideoActivity2 extends Activity
                             } else {
                                 dstBuf.clear();
                                 
-                                MediaCodecKit.YUV420SP_UV_EXCHANGE(width, height, inputFrame);
+                                MediaCodecKit.NV21_TO_YUV420SP(width, height, inputFrame);
                                 dstBuf.put(inputFrame);
                                 presentationTimeUs = numInputFrames*1000000/frameRate;
                                 numInputFrames++;

@@ -1,4 +1,4 @@
-package net.quantum6.codectest;
+package net.quantum6.cameracodec;
 
 import android.util.Log;
 import android.view.Surface;

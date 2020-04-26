@@ -1,11 +1,11 @@
-package net.quantum6.codectest;
+package net.quantum6.cameracodec;
 
 
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 
-import net.quantum6.codectest.R;
+import net.quantum6.cameracodec.R;
 
 /**
  * 安卓4.4上的。
@@ -13,7 +13,7 @@ import net.quantum6.codectest.R;
  * @author PC
  *
  */
-public final class SurfaceViewVideoActivity extends AbstractVideoActivity
+public final class VideoCodecActivity extends AbstractVideoActivity
 {
 
     //{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{

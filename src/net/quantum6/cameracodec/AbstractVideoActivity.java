@@ -1,4 +1,4 @@
-package net.quantum6.codectest;
+package net.quantum6.cameracodec;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -22,7 +22,7 @@ import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import net.quantum6.codectest.R;
+import net.quantum6.cameracodec.R;
 import net.quantum6.kit.SystemKit;
 
 /**
