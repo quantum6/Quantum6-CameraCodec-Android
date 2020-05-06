@@ -147,9 +147,8 @@ public abstract class AbstractVideoActivity extends Activity implements OnItemSe
                 case MESSAGE_CHANGE_SHAPE:
                     if (mCameraHelper.isInited)
                     {
-                        double ratio = 1.0 * mCameraHelper.mPreviewSize.width/mCameraHelper.mPreviewSize.height;
-                        adjustViewShape(mPreviewView, ratio);
-                        //adjustViewShape(mDisplayView, ratio);
+                        adjustViewShape(mPreviewView);
+                        adjustViewShape(mDisplayView);
                     }
                     else
                     {
@@ -202,8 +201,10 @@ public abstract class AbstractVideoActivity extends Activity implements OnItemSe
      * @param view
      * @param ratio
      */
-    private void adjustViewShape(View view, double ratio)
+    private void adjustViewShape(View view)
     {
+        double ratio = 1.0 * mCameraHelper.mPreviewSize.width/mCameraHelper.mPreviewSize.height;
+
         int height   = view.getMeasuredHeight();
         int newWidth = (int)(height*ratio);
         int width    = view.getMeasuredHeight();
